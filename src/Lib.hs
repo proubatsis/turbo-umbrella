@@ -6,6 +6,7 @@ module Lib
 
 import Data.Aeson
 import GHC.Generics
+import qualified Data.ByteString.Lazy.Char8 as B
 
 data InvoiceItem = InvoiceItem { item :: String
                                 , hours :: Int
@@ -19,5 +20,10 @@ x = InvoiceItem { item = "QA"
                 , hours = 4
                 , rate = 19 }
 
+myFunc :: String -> Maybe InvoiceItem
+myFunc s = decode $ B.pack s
+
 someFunc :: IO ()
-someFunc = putStrLn $ show $ encode x
+someFunc = do
+    f <- readFile "sample.json"
+    putStrLn $ show $ myFunc f
