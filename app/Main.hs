@@ -17,8 +17,10 @@ getOrganization = getEnv "HARVEST_ORGANIZATION"
 getPastTwoWeeks :: Day -> [Day]
 getPastTwoWeeks day = [ addDays i $ addDays (-14) day | i <- [0..13] ]
 
-getHarvestTimesheets :: String -> String -> String -> [Day] -> IO [Maybe HarvestResponse]
-getHarvestTimesheets username password organization days = mapM (fetchDay username password organization) days
+getHarvestTimesheets :: String -> String -> String -> [Day] -> IO (Maybe [HarvestResponse])
+getHarvestTimesheets username password organization days = do
+    timesheets <- mapM (fetchDay username password organization) days
+    return $ sequence timesheets
 
 main :: IO ()
 main = do
