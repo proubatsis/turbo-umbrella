@@ -2,10 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Harvest
-    ( fetchDay
+    ( getHarvestTimesheets
     , HarvestResponse
+    , toLineItem
     ) where
 
+import qualified Invoice as I
+import Data.List
 import Data.Aeson
 import GHC.Generics
 import Network.HTTP.Conduit
@@ -43,3 +46,11 @@ fetchDay username password organization day = do
     let (year, dayOfYear) = toOrdinalDate day
     s <- fetchDayString username password organization dayOfYear year
     return $ decode s
+
+getHarvestTimesheets :: String -> String -> String -> [Day] -> IO (Maybe [HarvestResponse])
+getHarvestTimesheets username password organization days = do
+    timesheets <- mapM (fetchDay username password organization) days
+    return $ sequence timesheets
+
+toLineItem :: String -> Day -> HarvestResponse -> I.InvoiceLineItem
+toLineItem title day timesheet = I.newLineItem title day $ sum $ map (\d -> hours d) $ day_entries timesheet
