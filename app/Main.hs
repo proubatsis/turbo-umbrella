@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import Harvest
@@ -6,6 +8,7 @@ import Data.Time.Clock
 import Data.Time.Calendar
 import System.Environment
 import GHC.Float
+import qualified Data.Text.Lazy as TL
 
 getUsername :: IO String
 getUsername = getEnv "HARVEST_USERNAME"
@@ -29,10 +32,12 @@ main = do
     let days = getPastTwoWeeks day
     timesheets <- getHarvestTimesheets username password organization days
     
-    let lineItems = do
+    let renderedInvoiceMaybe = do
             t <- timesheets
             let timesheetsByDay = zip days t
-            let items = map (\(x, y) -> toLineItem "MyTitle!" x y) timesheetsByDay
-            return $ filter (\x -> (float2Double $ I.hours x) > 0.0) items
+            let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem "MyTitle!" x y) timesheetsByDay
+            return $ I.renderInvoice items "invoice" "invoice-template/"
 
-    putStrLn $ show $ lineItems
+    renderedInvoice <- sequence $ renderedInvoiceMaybe
+    case renderedInvoice of Just r -> writeFile "invoice.tex" $ TL.unpack r
+                            Nothing -> putStrLn "Failed to render invoice!"

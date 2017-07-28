@@ -22,6 +22,8 @@ library
                       , http-conduit
                       , resourcet
                       , time
+                      , stache
+                      , text
   default-language:    Haskell2010
 
 executable turbo-umbrella-exe
@@ -31,6 +33,7 @@ executable turbo-umbrella-exe
   build-depends:       base
                      , turbo-umbrella
                      , time
+                     , text
   default-language:    Haskell2010
 
 test-suite turbo-umbrella-test
