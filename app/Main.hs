@@ -9,6 +9,7 @@ import Data.Time.Calendar
 import System.Environment
 import GHC.Float
 import qualified Data.Text.Lazy as TL
+import System.Process
 
 getUsername :: IO String
 getUsername = getEnv "HARVEST_USERNAME"
@@ -39,5 +40,8 @@ main = do
             return $ I.renderInvoice items "invoice" "invoice-template/"
 
     renderedInvoice <- sequence $ renderedInvoiceMaybe
-    case renderedInvoice of Just r -> writeFile "invoice.tex" $ TL.unpack r
+    case renderedInvoice of Just r -> do
+                                        writeFile "invoice.tex" $ TL.unpack r
+                                        createProcess $ shell "pdflatex invoice.tex"
+                                        return $ ()
                             Nothing -> putStrLn "Failed to render invoice!"
