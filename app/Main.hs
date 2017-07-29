@@ -12,37 +12,16 @@ import qualified Data.Text.Lazy as TL
 import System.Process
 import EMail
 
-getHarvestUsername :: IO String
 getHarvestUsername = getEnv "TURBO_UMBRELLA_HARVEST_USERNAME"
-
-getHarvestPassword :: IO String
 getHarvestPassword = getEnv "TURBO_UMBRELLA_HARVEST_PASSWORD"
-
-getHarvestOrganization :: IO String
 getHarvestOrganization = getEnv "TURBO_UMBRELLA_HARVEST_ORGANIZATION"
-
-getSmptHost :: IO String
 getSmptHost = getEnv "TURBO_UMBRELLA_SMTP_HOST"
-
-getSmtpUsername :: IO String
 getSmtpUsername = getEnv "TURBO_UMBRELLA_SMTP_USERNAME"
-
-getSmtpPassword :: IO String
 getSmtpPassword = getEnv "TURBO_UMBRELLA_SMTP_PASSWORD"
-
-getSmtpFromEmail :: IO String
 getSmtpFromEmail = getEnv "TURBO_UMBRELLA_SMTP_FROM_EMAIL"
-
-getSmtpToEmail :: IO String
 getSmtpToEmail = getEnv "TURBO_UMBRELLA_SMTP_TO_EMAIL"
-
-getLineItemTitle :: IO String
 getLineItemTitle = getEnv "TURBO_UMBRELLA_LINE_ITEM_TITLE"
-
-getEmailSubject :: IO String
 getEmailSubject = getEnv "TURBO_UMBRELLA_EMAIL_SUBJECT"
-
-getEmailBody :: IO String
 getEmailBody = getEnv "TURBO_UMBRELLA_EMAIL_BODY"
 
 getPastTwoWeeks :: Day -> [Day]
