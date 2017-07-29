@@ -1,2 +1,7 @@
 .stack-work/
 .vscode/
+set-env
+invoice.aux
+invoice.tex
+*.log
+*.pdf

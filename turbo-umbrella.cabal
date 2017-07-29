@@ -16,6 +16,7 @@ library
   exposed-modules:     Lib
                       , Harvest
                       , Invoice
+                      , EMail
   build-depends:       base >= 4.7 && < 5
                       , aeson
                       , bytestring
@@ -24,6 +25,9 @@ library
                       , time
                       , stache
                       , text
+                      , HaskellNet
+                      , HaskellNet-SSL
+                      , base64-bytestring
   default-language:    Haskell2010
 
 executable turbo-umbrella-exe
