@@ -55,7 +55,6 @@ main = do
             t <- timesheets
             let timesheetsByDay = zip days t
             let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x y) timesheetsByDay
-            let renderedInvoice = I.renderInvoice items "invoice" "invoice-template/"
             return $ I.renderInvoice items "invoice" "invoice-template/"
 
     renderedInvoice <- sequence $ renderedInvoiceMaybe
