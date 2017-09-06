@@ -17,3 +17,4 @@ CREATE TABLE timesheet_entry (
     hours decimal
 );
 
+INSERT INTO SQLITE_SEQUENCE VALUES ('invoice', 100);
