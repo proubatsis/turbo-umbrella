@@ -27,6 +27,7 @@ library
                       , HaskellNet
                       , HaskellNet-SSL
                       , base64-bytestring
+                      , sqlite-simple
   default-language:    Haskell2010
 
 executable turbo-umbrella-exe

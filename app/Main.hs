@@ -51,17 +51,20 @@ main = do
     timesheets <- getHarvestTimesheets harvestUsername harvestPassword harvestOrganization days
     
     putStrLn "Generating invoice..." -- Generate
-    let renderedInvoiceMaybe = do
+    let itemsMaybe = do
             t <- timesheets
             let timesheetsByDay = zip days t
             let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x y) timesheetsByDay
-            let renderedInvoice = I.renderInvoice items "invoice" "invoice-template/"
-            return $ I.renderInvoice items "invoice" "invoice-template/"
+            return items
 
-    renderedInvoice <- sequence $ renderedInvoiceMaybe
-    case renderedInvoice of Just r -> do
-                                        writeFile "invoice.tex" $ TL.unpack r
-                                        createProcess $ shell "pdflatex invoice.tex > pdflatex-invoice.log"
-                                        putStrLn "Sending invoice..." -- Send
-                                        sendEmail smtpHost smtpUsername smtpPassword $ createEmail smtpFromEmail smtpToEmail emailSubject emailBody ["invoice.pdf"]
-                            Nothing -> putStrLn "Failed to render invoice!"
+    case itemsMaybe of
+        Just items -> do
+                r <- I.renderInvoice items "invoice" "invoice-template/"
+                writeFile "invoice.tex" $ TL.unpack r
+                createProcess $ shell "pdflatex invoice.tex > pdflatex-invoice.log"
+                putStrLn "Saving invoice..."
+                invoiceNumber <- I.saveInvoice "sample.db" items
+                putStrLn $ "Invoice saved as " ++ (show invoiceNumber)
+                putStrLn "Sending invoice..." -- Send
+                sendEmail smtpHost smtpUsername smtpPassword $ createEmail smtpFromEmail smtpToEmail emailSubject emailBody ["invoice.pdf"]
+        Nothing -> putStrLn "Failed to render invoice!"
