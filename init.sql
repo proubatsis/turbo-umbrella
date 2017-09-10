@@ -1,6 +1,8 @@
 CREATE TABLE invoice (
     id integer primary key autoincrement,
-    title text not null
+    title text not null,
+    start_date date not null,
+    end_date date not null
 );
 
 CREATE TABLE invoice_item (
