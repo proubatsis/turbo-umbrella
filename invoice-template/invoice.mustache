@@ -1,17 +1,18 @@
 \documentclass{article}
 
 \begin{document}
-Invoice Number: {{invoiceId}} \\
-{{invoiceTitle}} \\
+Invoice Number: {{number}} \\
+{{title}} \\
 Start: {{startDate}} \\
 End: {{endDate}} \\
 \begin{center}
 \begin{tabular} { |c|c|c| }
 \hline
-{{#invoiceItems}}
+{{#items}}
 {{title}} & {{date}} & {{hours}} \\
-{{/invoiceItems}}
+{{/items}}
 \hline
 \end{tabular}
 \end{center}
+Total Hours: {{totalHours}}
 \end{document}
