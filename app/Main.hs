@@ -59,12 +59,13 @@ main = do
 
     case invoiceMaybe of
         Just invoice -> do
-                r <- I.renderInvoice (I.invoiceItems invoice) "invoice" "invoice-template/"
+                putStrLn "Saving invoice..." -- Save
+                invoiceNumber <- I.saveInvoice "sample.db" invoice
+                putStrLn $ "Invoice saved as " ++ (show invoiceNumber)
+                putStrLn "Generating PDF..." -- PDF
+                r <- I.renderInvoice (I.withInvoiceId invoiceNumber invoice) "invoice" "invoice-template/"
                 writeFile "invoice.tex" $ TL.unpack r
                 createProcess $ shell "pdflatex invoice.tex > pdflatex-invoice.log"
-                putStrLn "Saving invoice..."
-                invoiceNumber <- I.saveInvoice "sample.db" (I.invoiceItems invoice)
-                putStrLn $ "Invoice saved as " ++ (show invoiceNumber)
                 putStrLn "Sending invoice..." -- Send
                 sendEmail smtpHost smtpUsername smtpPassword $ createEmail smtpFromEmail smtpToEmail emailSubject emailBody ["invoice.pdf"]
         Nothing -> putStrLn "Failed to render invoice!"

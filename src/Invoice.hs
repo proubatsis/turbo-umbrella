@@ -8,6 +8,7 @@ module Invoice
     , newLineItem
     , renderInvoice
     , saveInvoice
+    , withInvoiceId
     ) where
 
 import Data.Time.Calendar
@@ -40,21 +41,26 @@ createInvoice invoiceTitle days items = Invoice { invoiceId = 0
                                                 , invoiceItems = items
                                                 }
 
+withInvoiceId :: Int -> Invoice -> Invoice
+withInvoiceId newId inv =
+    inv { invoiceId = newId }
+
 newLineItem :: String -> Day -> Float -> InvoiceLineItem
 newLineItem t d h = InvoiceLineItem { title = t
                                     , date = d
                                     , hours = h }
 
-renderInvoice :: [InvoiceLineItem] -> PName -> String -> IO TL.Text
-renderInvoice items templateEntryFileName templateDirName = do
+renderInvoice :: Invoice -> PName -> String -> IO TL.Text
+renderInvoice invoice templateEntryFileName templateDirName = do
     template <- compileMustacheDir templateEntryFileName templateDirName
-    let val = toJSON items
+    let val = toJSON invoice
     return $ renderMustache template val
 
-saveInvoice :: String -> [InvoiceLineItem] -> IO Int
-saveInvoice dbFile items = do
+saveInvoice :: String -> Invoice -> IO Int
+saveInvoice dbFile invoice = do
+    let items = invoiceItems invoice
     conn <- DB.open dbFile
-    DB.execute conn "INSERT INTO invoice (title) VALUES (?)" $ DB.Only ("My Invoice" :: String)
+    DB.execute conn "INSERT INTO invoice (title, start_date, end_date) VALUES (?, ?, ?)" $ DB.toRow (invoiceTitle invoice :: String, startDate invoice :: Day, endDate invoice :: Day)
     invoiceId <- DB.lastInsertRowId conn >>= (\x -> return $ fromIntegral x)
     mapM (\x -> DB.execute conn "INSERT INTO invoice_item (invoice_id, title, work_date, hours, rate) VALUES (?, ?, ?, ?, ?)" $ DB.toRow (invoiceId :: Int, title x :: String, date x :: Day, hours x :: Float, 100 :: Float)) items
     DB.close conn
