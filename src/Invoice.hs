@@ -17,6 +17,7 @@ import Text.Mustache
 import GHC.Generics
 import qualified Data.Text.Lazy as TL
 import qualified Database.SQLite.Simple as DB
+import Text.Printf
 
 data InvoiceLineItem = InvoiceLineItem { title :: String
                                         , date :: Day
@@ -34,9 +35,9 @@ data Invoice = Invoice { invoiceId :: Int
 instance ToJSON InvoiceLineItem where
     toJSON i = object [ "title" .= title i
                       , "date" .= date i
-                      , "hours" .= hours i
-                      , "rate" .= rate i
-                      , "total" .= ((rate i) * (hours i))
+                      , "hours" .= ((printf "%.2f" $ hours i) :: String)
+                      , "rate" .= ((printf "\\$%.2f" $ rate i) :: String)
+                      , "total" .= ((printf "\\$%.2f" $ (rate i) * (hours i)) :: String)
                       ]
 
 instance ToJSON Invoice where
@@ -45,8 +46,8 @@ instance ToJSON Invoice where
                       , "startDate" .= startDate i
                       , "endDate" .= endDate i
                       , "items" .= invoiceItems i
-                      , "totalHours" .= (sum $ map hours $ invoiceItems i)
-                      , "total" .= (sum $ map (\item -> ((hours item) * (rate item))) $ invoiceItems i)
+                      , "totalHours" .= ((printf "%.2f" $ sum $ map hours $ invoiceItems i) :: String)
+                      , "total" .= ((printf "\\$%.2f" $ sum $ map (\item -> ((hours item) * (rate item))) $ invoiceItems i) :: String)
                       ]
 
 createInvoice :: String -> [Day] -> [InvoiceLineItem] -> Invoice
