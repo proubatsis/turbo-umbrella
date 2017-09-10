@@ -21,6 +21,7 @@ import qualified Database.SQLite.Simple as DB
 data InvoiceLineItem = InvoiceLineItem { title :: String
                                         , date :: Day
                                         , hours :: Float
+                                        , rate :: Float
                                         } deriving (Generic,Show)
 
 data Invoice = Invoice { invoiceId :: Int
@@ -53,10 +54,11 @@ withInvoiceId :: Int -> Invoice -> Invoice
 withInvoiceId newId inv =
     inv { invoiceId = newId }
 
-newLineItem :: String -> Day -> Float -> InvoiceLineItem
-newLineItem t d h = InvoiceLineItem { title = t
+newLineItem :: String -> Day -> Float -> Float -> InvoiceLineItem
+newLineItem t d r h = InvoiceLineItem { title = t
                                     , date = d
-                                    , hours = h }
+                                    , hours = h
+                                    , rate = r }
 
 renderInvoice :: Invoice -> PName -> String -> IO TL.Text
 renderInvoice invoice templateEntryFileName templateDirName = do
@@ -70,6 +72,6 @@ saveInvoice dbFile invoice = do
     conn <- DB.open dbFile
     DB.execute conn "INSERT INTO invoice (title, start_date, end_date) VALUES (?, ?, ?)" $ DB.toRow (invoiceTitle invoice :: String, startDate invoice :: Day, endDate invoice :: Day)
     invoiceId <- DB.lastInsertRowId conn >>= (\x -> return $ fromIntegral x)
-    mapM (\x -> DB.execute conn "INSERT INTO invoice_item (invoice_id, title, work_date, hours, rate) VALUES (?, ?, ?, ?, ?)" $ DB.toRow (invoiceId :: Int, title x :: String, date x :: Day, hours x :: Float, 100 :: Float)) items
+    mapM (\x -> DB.execute conn "INSERT INTO invoice_item (invoice_id, title, work_date, hours, rate) VALUES (?, ?, ?, ?, ?)" $ DB.toRow (invoiceId :: Int, title x :: String, date x :: Day, hours x :: Float, rate x :: Float)) items
     DB.close conn
     return invoiceId

@@ -52,5 +52,5 @@ getHarvestTimesheets username password organization days = do
     timesheets <- mapM (fetchDay username password organization) days
     return $ sequence timesheets
 
-toLineItem :: String -> Day -> HarvestResponse -> I.InvoiceLineItem
-toLineItem title day timesheet = I.newLineItem title day $ sum $ map (\d -> hours d) $ day_entries timesheet
+toLineItem :: String -> Day -> Float -> HarvestResponse -> I.InvoiceLineItem
+toLineItem title day rate timesheet = I.newLineItem title day rate $ sum $ map (\d -> hours d) $ day_entries timesheet

@@ -54,7 +54,7 @@ main = do
     let invoiceMaybe = do
             t <- timesheets
             let timesheetsByDay = zip days t
-            let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x y) timesheetsByDay
+            let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x 25 y) timesheetsByDay
             return $ I.createInvoice "My Amazing Invoice" days items
 
     case invoiceMaybe of
