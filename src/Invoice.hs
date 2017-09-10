@@ -3,6 +3,8 @@
 
 module Invoice
     ( InvoiceLineItem(..)
+    , Invoice(..)
+    , createInvoice
     , newLineItem
     , renderInvoice
     , saveInvoice
@@ -20,7 +22,23 @@ data InvoiceLineItem = InvoiceLineItem { title :: String
                                         , hours :: Float
                                         } deriving (Generic,Show)
 
+data Invoice = Invoice { invoiceId :: Int
+                        , invoiceTitle :: String
+                        , startDate :: Day
+                        , endDate :: Day
+                        , invoiceItems :: [InvoiceLineItem]
+                        } deriving (Generic,Show)
+
 instance ToJSON InvoiceLineItem
+instance ToJSON Invoice
+
+createInvoice :: String -> [Day] -> [InvoiceLineItem] -> Invoice
+createInvoice invoiceTitle days items = Invoice { invoiceId = 0
+                                                , invoiceTitle = invoiceTitle
+                                                , startDate = head days
+                                                , endDate = last days
+                                                , invoiceItems = items
+                                                }
 
 newLineItem :: String -> Day -> Float -> InvoiceLineItem
 newLineItem t d h = InvoiceLineItem { title = t

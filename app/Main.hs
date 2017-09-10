@@ -51,19 +51,19 @@ main = do
     timesheets <- getHarvestTimesheets harvestUsername harvestPassword harvestOrganization days
     
     putStrLn "Generating invoice..." -- Generate
-    let itemsMaybe = do
+    let invoiceMaybe = do
             t <- timesheets
             let timesheetsByDay = zip days t
             let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x y) timesheetsByDay
-            return items
+            return $ I.createInvoice "My Amazing Invoice" days items
 
-    case itemsMaybe of
-        Just items -> do
-                r <- I.renderInvoice items "invoice" "invoice-template/"
+    case invoiceMaybe of
+        Just invoice -> do
+                r <- I.renderInvoice (I.invoiceItems invoice) "invoice" "invoice-template/"
                 writeFile "invoice.tex" $ TL.unpack r
                 createProcess $ shell "pdflatex invoice.tex > pdflatex-invoice.log"
                 putStrLn "Saving invoice..."
-                invoiceNumber <- I.saveInvoice "sample.db" items
+                invoiceNumber <- I.saveInvoice "sample.db" (I.invoiceItems invoice)
                 putStrLn $ "Invoice saved as " ++ (show invoiceNumber)
                 putStrLn "Sending invoice..." -- Send
                 sendEmail smtpHost smtpUsername smtpPassword $ createEmail smtpFromEmail smtpToEmail emailSubject emailBody ["invoice.pdf"]
