@@ -23,6 +23,7 @@ getSmtpToEmail = getEnv "TURBO_UMBRELLA_SMTP_TO_EMAIL"
 getLineItemTitle = getEnv "TURBO_UMBRELLA_LINE_ITEM_TITLE"
 getEmailSubject = getEnv "TURBO_UMBRELLA_EMAIL_SUBJECT"
 getEmailBody = getEnv "TURBO_UMBRELLA_EMAIL_BODY"
+getRate = getEnv "TURBO_UMBRELLA_HOURLY_RATE"
 
 getPastTwoWeeks :: Day -> [Day]
 getPastTwoWeeks day = [ addDays i $ addDays (-14) day | i <- [0..13] ]
@@ -43,6 +44,7 @@ main = do
     lineItemTitle <- getLineItemTitle
     emailSubject <- getEmailSubject
     emailBody <- getEmailBody >>= stringToTextIO
+    rate <- getRate >>= (\x -> return $ read x)
 
     UTCTime day time <- getCurrentTime
     
@@ -54,7 +56,7 @@ main = do
     let invoiceMaybe = do
             t <- timesheets
             let timesheetsByDay = zip days t
-            let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x 25 y) timesheetsByDay
+            let items = filter (\x -> (float2Double $ I.hours x) > 0.0) $ map (\(x, y) -> toLineItem lineItemTitle x rate y) timesheetsByDay
             return $ I.createInvoice "My Amazing Invoice" days items
 
     case invoiceMaybe of

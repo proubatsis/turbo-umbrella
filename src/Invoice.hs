@@ -31,7 +31,13 @@ data Invoice = Invoice { invoiceId :: Int
                         , invoiceItems :: [InvoiceLineItem]
                         } deriving (Generic,Show)
 
-instance ToJSON InvoiceLineItem
+instance ToJSON InvoiceLineItem where
+    toJSON i = object [ "title" .= title i
+                      , "date" .= date i
+                      , "hours" .= hours i
+                      , "rate" .= rate i
+                      , "total" .= ((rate i) * (hours i))
+                      ]
 
 instance ToJSON Invoice where
     toJSON i = object [ "number" .= invoiceId i
@@ -40,6 +46,7 @@ instance ToJSON Invoice where
                       , "endDate" .= endDate i
                       , "items" .= invoiceItems i
                       , "totalHours" .= (sum $ map hours $ invoiceItems i)
+                      , "total" .= (sum $ map (\item -> ((hours item) * (rate item))) $ invoiceItems i)
                       ]
 
 createInvoice :: String -> [Day] -> [InvoiceLineItem] -> Invoice

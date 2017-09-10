@@ -6,13 +6,14 @@ Invoice Number: {{number}} \\
 Start: {{startDate}} \\
 End: {{endDate}} \\
 \begin{center}
-\begin{tabular} { |c|c|c|c| }
+\begin{tabular} { |c|c|c|c|c| }
 \hline
 {{#items}}
-{{title}} & {{date}} & {{rate}} & {{hours}} \\
+{{title}} & {{date}} & {{rate}} & {{hours}} & {{total}} \\
 {{/items}}
 \hline
 \end{tabular}
 \end{center}
 Total Hours: {{totalHours}}
+Total: {{total}}
 \end{document}
